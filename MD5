@@ -1,0 +1,9 @@
+cefcc18f77b1dd1546ff9e5a56794e23 *DESCRIPTION
+49815a54a4da9b712c4447338b086a3b *NAMESPACE
+989426766315ee54555858975eea148a *NEWS.md
+2f3376a300960da9ce61ac429c4d1548 *R/jackknife.cor.R
+df6511e846b87214aba57bb3aa64d2dc *R/jackknife.lm.R
+ca18afc3acb969c8ae905e4a14798100 *README.md
+b31a06d243c882095c79b8ee2ac35ab8 *build/partial.rdb
+e189c3fc307f87a22fbc04487f99ff00 *man/jackknife.cor.Rd
+66ae29375ad229024258b902e8bcc396 *man/jackknife.lm.Rd
