@@ -4,15 +4,16 @@
 \alias{jackknife.lm}
 \title{Delete-d Jackknife Estimate for Linear Regression}
 \usage{
-jackknife.lm(formula, d, data)
+jackknife.lm(formula, d = 1, data, conf = 0.95)
 }
 \arguments{
 \item{formula}{Simple or multiple  linear regression formula with dependent and independent variables}
 
-\item{d}{Number of observations to be deleted from data to make jackknife samples}
+\item{d}{Number of observations to be deleted from data to make jackknife samples. The default is 1 (for delete-1 jackknife).}
 
-\item{data}{Data frame with dependent and independent independent variables
-specified in the formula}
+\item{data}{Data frame with dependent and independent independent variables specified in the formula}
+
+\item{conf}{Confidence level, a positive number < 1. The default is 0.95.}
 }
 \value{
 A list containing a summary data frame of jackknife estimates
@@ -28,6 +29,7 @@ as specified in the formula and estimates the jackknife coefficients
 bias standard error, standard error and confidence intervals.
 }
 \examples{
+## library(jackknifeR)
 j.lm <- jackknife.lm(dist~speed, d = 2, data = cars)
 j.lm$jackknife.summary
 summary(j.lm$lm_mod)$coefficients
