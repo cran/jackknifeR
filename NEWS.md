@@ -1,3 +1,12 @@
+# jackknifeR 1.2.0
+
+* Updated the functions with provisions for parallel processing.
+* Wrapper functions are corrected for efficiency.
+
+# jackknifeR 1.0.1
+
+* Updated summary function in example
+
 # jackknifeR 1.0.0
 
 * Version release

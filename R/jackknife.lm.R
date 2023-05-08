@@ -10,6 +10,7 @@
 #' @param d Number of observations to be deleted from data to make jackknife samples. The default is 1 (for delete-1 jackknife).
 #' @param data Data frame with dependent and independent independent variables specified in the formula
 #' @param conf Confidence level, a positive number < 1. The default is 0.95.
+#' @param numCores Number of processors to be used
 #' @return A list containing a summary data frame of jackknife estimates
 #'    with bias, standard error. t-statistics, and confidence intervals,
 #'    linear regression model of original data and a data frame with
@@ -25,62 +26,22 @@
 #' *Statistics & Probability Letters*, *6*(5), 341-347.
 #' \doi{10.1016/0167-7152(88)90011-9}
 #' @seealso [lm()] which is used for linear regression.
-#' @importFrom stats coefficients lm qnorm
-#' @importFrom utils combn
+#' @importFrom stats coef lm
 #' @export
 #' @examples
 #' ## library(jackknifeR)
-#' j.lm <- jackknife.lm(dist~speed, d = 2, data = cars)
-#' j.lm$jackknife.summary
-#' summary(j.lm$lm_mod)$coefficients
+#' j.lm <- jackknife.lm(dist~speed, d = 2, data = cars, numCores = 2)
+#' summary(j.lm)
 #'
-jackknife.lm <- function(formula, d = 1,  data, conf = 0.95){
-
+jackknife.lm <- function(formula, d = 1,  data, conf = 0.95, numCores = detectCores()){
+  cl <- match.call()
   n <- nrow(data)
-  if(is.numeric(conf)==FALSE||conf>1||conf<0) stop("Error: confidence level must be a numerical value between 0 and 1, e.g. 0.95")
-  if((n*ncol(data))^d > 9e+07) stop("The number of jackknife sub-samples will be huge")
-  if((n*ncol(data))^d > 1e+04){message("This may take more time. Please wait...")}
-
-  cmb <- combn(n, d) # Row indexes to be eliminated for jackknife
-  N <- ncol(cmb)     # Total number of jackknife samples
-
-  lm_mod <- lm(formula, data = data) # Linear regression estimate
-
-  # A data frame to collect the jackknife estimates
-  jk <- as.data.frame(matrix(nrow = N, ncol = length(coefficients(lm_mod))))
-  colnames(jk) <- names(coefficients(lm_mod))
-
-  for (i in 1:N) {
-    j <- cmb[,i]
-    mod <- lm(formula, data = data[-j,])
-    jk[i,] <- coefficients(mod)
-  }
-
-  theta_hat <- coefficients(lm_mod) # Regression coefficient estimates
-  theta_dot_hat <- colMeans(jk) # Mean of regression coefficient estimates of jackknife samples
-  bias <- (n-d) * (theta_dot_hat-theta_hat) # Bias
-  est <- theta_hat-bias
-  jack_se <- sqrt((n-d)/d  *  rowMeans(apply(jk, 1, function(x) (x-theta_hat)^2))) # Jackknife standard error
-  jack_ci_lower <- est-(qnorm(0.5+(conf/2))*jack_se)
-  jack_ci_upper <- est+(qnorm(0.5+(conf/2))*jack_se)
-
-  jackknife.summary <- data.frame(Estimate = est,
-                                  bias = bias,
-                                  se = jack_se,
-                                  t = est/jack_se,
-                                  ci.lower = jack_ci_lower,
-                                  ci.upper = jack_ci_upper)
-
-  jk.r <- list(jackknife.summary = jackknife.summary,
-               d = d,
-               conf.level = conf,
-               stat = formula,
-               n.jack = N,
-               original.estimate = theta_hat,
-               lm_mod = lm_mod,
-               Jackknife.samples.est = jk)
-  class(jk.r) <- "jk"
-
-  return(jk.r)
+  fn <- as.formula(formula)
+  j.lm <- jackknife(statistic = function(data){
+    coef(lm(formula = fn, data = data))
+  }, d = d, data =  data, conf = conf, numCores = numCores)
+  j.lm$call <- cl
+  return(j.lm)
 }
+
 
