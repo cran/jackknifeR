@@ -32,9 +32,8 @@ bias standard error, standard error and confidence intervals.
 }
 \examples{
 ## library(jackknifeR)
-j.lm <- jackknife.lm(dist~speed, d = 2, data = cars, numCores = 2)
-summary(j.lm)
-
+jk <- jackknife.lm(mpg ~ wt + hp, d = 2, data = mtcars, numCores = 2)
+summary(jk)
 }
 \references{
 Quenouille, M. H. (1956). Notes on Bias in Estimation.
